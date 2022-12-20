@@ -1,4 +1,4 @@
 # MC_Rocket_Kart_Racing
 
 
-![](https://mc-api-staging.s3.amazonaws.com/Chapter_1.gif)
+![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_1.gif)
