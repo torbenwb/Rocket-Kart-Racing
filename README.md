@@ -200,6 +200,28 @@ private void OnTriggerEnter(Collider other)
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_3.gif)
 
+After implementing all of the player's core abilities and mechanics, it's time to move on to a game mode that requires the player to use their abilities. The Time Trials game mode was chosen because it can be easily implemented without adding support for AI racers or mulitplayer. One of the main design goals when implementing this was to eliminate all coupling between scripts and the current game mode. In short: the game mode script may rely on specific scripts / components but no other scripts should rely on the game mode.
+
+For example: the Time Trials game mode uses checkpoints, but we might want to reuse these checkpoints in another game mode so we want to make sure to design the checkpoints with this in mind.
+
+The first step in creating the Time Trials game mode was determining the basic progression of each round as well as the player's goal / win condition.
+
+* **Win Condition**: Reach the end of the race faster than the previous fastest time.
+* **Progression**: 
+  * Pre race setup
+  * Start countdown
+  * Start race
+  * End race
+
+To keep things organized I turned the progression described above into series of methods for the `TimeTrials` script which are called at the beginning of each phase.
+
+* `PreRaceSetup` performs all necessary setup such as getting a reference to the player and disabling control until the end of the countdown.
+* `StartCountdown` pretty much just invokes `StartRace` after a certain amount of seconds.
+* `StartRace` enables player control.
+* `EndRace` is called when the player passes the first checkpoint for the final time, depending on the number of laps.
+
+The `Checkpoint` and `BoundsVolume` scripts are designed to mark the progression of the player and the bounds of the level respectively. Each of them are entirely game mode agnostic and simple detect when an object of the correct type (object with tag `Car`) has entered their trigger volume, and if so they fire an event to which the game mode is listening.
+
 ## Polish and UI
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_4.gif)
