@@ -1,5 +1,11 @@
 # MC_Rocket_Kart_Racing
 
+In this project my goal was to create a racing game using a physics driven car model while incorporating the player abilities from Rocket League specifically the abilities to jump / air jump, control the rotation of the car in the air, and to rocket boost in the car's forward direction. With the car and abilities, I created three different game modes:
+
+* **Time Trials**: A simple race track where the player competes against their best time. The race track was designed to require the use of the abilities described above.
+* **Tricks**: An optional mode where the player drives around a giant skate park and increases their score by performing tricks in the air.
+* **Practice Pitch**: A simplified version of the practice pitch in Rocket League where players can practice scoring goals without AI or other players.
+
 ## Physics Driven Car
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_1.gif)
