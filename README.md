@@ -27,4 +27,4 @@ The first step in building any racing / car based action game is the car. In thi
 
 ## Polish and UI
 
-https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_4.gif)
+![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_4.gif)
