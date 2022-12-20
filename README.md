@@ -19,3 +19,8 @@ The first step in building any racing / car based action game is the car. In thi
 
 ## Player Abilities
 
+![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_2.gif)
+
+## Time Trials 
+
+## Polish and UI
