@@ -87,9 +87,76 @@ private void ApplyLateralForce()
 }
 ```
 
+### Turning Force
+
+The final force to apply is the turning force (torque) which is proportional to the car's current forward velocity. In a more accurate physics simulation the torque would be calculated by applying forces at the position of each wheel but since I'm aiming for a more arcadey feel I decided to opt for a simpler approximation.
+
+```cs
+private void ApplyTurningForce()
+{
+    float forwardVelocity = Vector3.Dot(transform.forward, rigidbody.velocity);
+    float rotationalVelocity = Vector3.Dot(transform.up, rigidbody.angularVelocity);
+
+    float torque = forwardVelocity * turnAxis * (Mathf.Deg2Rad * steeringAngle);
+    torque += -rotationalVelocity * turnDamping;
+
+    rigidbody.AddTorque(transform.up * torque);
+}
+```
+
 ## Player Abilities
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_2.gif)
+
+After implementing the car controller, it was time to move on to the Rocket League player abilities. To avoid making changes to the `Car` script, these abilities are implemented in the `AirControl` and `RocketBoost` scripts.
+
+I reverse engineered these mechanics as follows:
+
+### Jump / Air Jump
+
+In Rocket League, the player has access to a jump when on the ground as well as a single, less powerful jump while in the air. This air jump resets when the player touches the ground. Jump force is applied as an impulse force in the car's upwards direction so if the car is rotated in any way that will affect the direction in which force is applied.
+
+```cs
+private void ApplyJumpForce(){
+    if (car.GetGrounded()){
+        yawRotation = pitchRotation = rollRotation = 0f;
+        rigidbody.AddForce(transform.up * jumpStrength, ForceMode.Impulse);
+        jumpFX.Play();
+    }
+    else{
+        if (airJumps > 0){
+            rigidbody.AddForce(transform.up * jumpStrength * airMod, ForceMode.Impulse);
+            jumpFX.Play();
+            airJumps--;
+        }
+    }
+}
+```
+
+### Rotation Control
+
+To control the rotation of the car in the air, we have to determine how quickly the car is already rotating in each direction. If the player is attempting to rotate further in that direction, torque is applied proportional the corresponding rotation rate, if the player is not attempting to rotate in that direction then oppositional damping force is applied instead.
+
+```cs
+private void ApplyAirRotationForce(){
+    float pitchVelocity = Vector3.Dot(transform.right, rigidbody.angularVelocity);
+    float yawVelocity = Vector3.Dot(transform.up, rigidbody.angularVelocity);
+    float rollVelocity = Vector3.Dot(transform.forward, rigidbody.angularVelocity);
+
+    float yawTorque = (Mathf.Abs(yawAxis) > 0f) ? yawAxis * yawRate : -yawVelocity * rotationDamping;
+    float rollTorque = (Mathf.Abs(rollAxis) > 0f) ? rollAxis * rollRate : -rollVelocity * rotationDamping;
+    float pitchTorque = (Mathf.Abs(pitchAxis) > 0f) ? pitchAxis * pitchRate : -pitchVelocity * rotationDamping;
+
+    rigidbody.AddTorque(transform.up * yawTorque);
+    rigidbody.AddTorque(transform.forward * rollTorque);
+    rigidbody.AddTorque(transform.right * pitchTorque);
+
+
+    yawRotation = (Mathf.Abs(yawAxis) > 0f) ? yawAxis * yawRate : 0f;
+    rollRotation = (Mathf.Abs(rollAxis) > 0f) ? rollAxis * rollRate : 0f;
+    pitchRotation = (Mathf.Abs(pitchAxis) > 0f) ? pitchAxis * pitchRate : 0f;
+}
+```
 
 ## Time Trials 
 
