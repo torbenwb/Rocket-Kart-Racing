@@ -222,6 +222,106 @@ To keep things organized I turned the progression described above into series of
 
 The `Checkpoint` and `BoundsVolume` scripts are designed to mark the progression of the player and the bounds of the level respectively. Each of them are entirely game mode agnostic and simple detect when an object of the correct type (object with tag `Car`) has entered their trigger volume, and if so they fire an event to which the game mode is listening.
 
+#### `Checkpoint`
+
+```cs
+private void OnTriggerEnter(Collider other)
+{
+    if (!checkpointEnabled) return;
+
+    if (other.attachedRigidbody.CompareTag("Car")){
+        OnCheckpointPassed.Invoke(this, other.attachedRigidbody.gameObject);
+
+        SetCheckpointEnabled(false);
+    }
+}
+```
+
+#### `TimeTrials`
+
+Whenever a checkpoints is passed it's disabled, the checkpoint index is incremented / looped and then the next checkpoint is enabled.
+
+```cs
+void OnCheckpointPassed(Checkpoint checkpoint, GameObject gameObject){
+    checkpoint.SetCheckpointEnabled(false);
+
+    // If passed first checkpoint - new lap.
+    if (checkpointIndex == 0){
+        currentLap++;
+        if (currentLap > totalLaps) EndRace();
+    }
+
+    checkpointIndex++;
+    if (checkpointIndex >= checkpoints.Count) checkpointIndex = 0;
+    checkpoints[checkpointIndex].SetCheckpointEnabled(true);
+}
+```
+
 ## Polish and UI
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_4.gif)
+
+With the game mode and player abilities implemented it was time to add some finishing touches and user interface as well as saving / loading the player's high score at the end of each race.
+
+### Player UI
+
+My goal with the `PlayerUI` script was to make it as easy as possible for the various scripts that needed to update UI information to do so. To implement this I added a Dictionary with a list of `Text` components mapped to a given `string` key. Any other script need simply call `SetText()` providing the key and the updated text and then all `Text` components corresponding to that key will be updated.
+
+```cs
+public static void SetText(string key, string newText){
+    if (textComponentMap.ContainsKey(key)){
+        List<Text> l = textComponentMap[key];
+        int i = 0;
+        while(i < l.Count){
+            if(l[i]){
+                l[i].text = newText;
+                i++;
+            }
+            else{
+                l.RemoveAt(i);
+            }
+        }
+    }
+}
+```
+
+This same method was applied later to create the boost meter which displays the player's remaining boost resource. Here instead of `Text` components we're updating the `fillAmount` of various images.
+
+```cs
+public static void SetImageFill(string key, float fill){
+    if (imageComponentMap.ContainsKey(key)){
+        List<Image> l = imageComponentMap[key];
+        int i = 0;
+        while(i < l.Count){
+            if(l[i]){
+                l[i].fillAmount = fill;
+                i++;
+            }
+            else{
+                l.RemoveAt(i);
+            }
+        }
+    }
+}
+```
+
+Since these dictionaries are static and may persist between scenes, each time we update we also check if any of the components in the collection have become `null` and if so they are removed from the collection.
+
+### High Score 
+
+To avoid writing more complex save/load systems I opted to instead use the `PlayerPrefs` class to save the player's best time with player preferences. At the end of each race, the player's high score is loaded using `GetFloat` and the `trackName` (this allows for multiple tracks in the future). The current high score is compared against the player's new race time, and if the new race time is less than the current high score, **OR** there isn't yet a high score, the high score is updated and saved.
+
+```cs
+private void HighScore(){
+    float highScore = PlayerPrefs.GetFloat($"{trackName}_HighScore",0.0f);
+    float raceTime = GetRaceTime();
+    if (raceTime < highScore || highScore == 0f){
+        highScore = raceTime;
+        PlayerPrefs.SetFloat($"{trackName}_HighScore",highScore);
+        PlayerPrefs.Save();
+        PlayerUI.SetText("HighScore", $"New High Score: {highScore}");
+
+    }
+    Invoke("Restart", 3f);
+}
+```
