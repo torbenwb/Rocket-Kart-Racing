@@ -17,6 +17,76 @@ The first step in building any racing / car based action game is the car. In thi
 * **Lateral Force**: Right/Left force provides force oppositional to lateral velocity based on friction coefficient.
 * **Turning Force**: Converts user input and forward velocity into torque to turn the car at a certain rate while driving forward / backward.
 
+### Suspension Force 
+
+Suspension force is calculated per wheel touching the ground. For each wheel, the `Car` script performs a downwards raycast at the wheel's position. The distance between the desired end of the raycast and the hit point determines the `offset`. The greater the `offset` the more spring force applied to push the car back up.
+
+```cs
+private void ApplySuspensionForce()
+  {
+      bool tempGrounded = false;
+
+      foreach(Transform wheel in wheels)
+      {
+          Vector3 origin = wheel.position;
+          Vector3 direction = -wheel.up;
+          RaycastHit hit;
+          float offset = 0f;
+
+          if (Physics.Raycast(origin,direction,out hit, wheelRadius)){
+              tempGrounded = true;
+
+              Vector3 end = origin + (direction * wheelRadius);
+              offset = (end - hit.point).magnitude;
+
+              float pointVelocity = Vector3.Dot(wheel.up, rigidbody.GetPointVelocity(wheel.position));
+              float suspensionForce = (springStrength * offset) + (-pointVelocity * springDamping);
+              rigidbody.AddForceAtPosition(wheel.up * suspensionForce, wheel.position);
+
+              wheel.GetChild(0).transform.localPosition = Vector3.up * offset;
+          }
+      }
+
+      grounded = tempGrounded;
+  }
+```
+
+### Longitudinal Force
+
+The longitudinal force is calculated by determining whether or not the player is trying to move forward / backward. If so, then friction is ignored and instead we apply force porportional to the player's input axis and the ratio of remaining speed. This ratio is defined by how fast the car is currently moving in its forwad direction. If the car is already moving at max speed, then no force will be applied.
+
+When the player is not applying input, the force applied will be proportional to the current velocity of the car multiplied by the longitudinal friction coefficient.
+
+```cs
+private void ApplyLongitudinalForce()
+{
+    Vector3 force = Vector3.zero;
+    float forwardVelocity = Vector3.Dot(transform.forward, rigidbody.velocity);
+    float maxSpeedRatio = (1 - (Mathf.Abs(forwardVelocity) / maxSpeed));
+
+    if (Mathf.Abs(driveAxis) > 0){
+       force = transform.forward * driveAxis * maxSpeed * maxSpeedRatio;
+    }
+    else{
+        force = transform.forward * -forwardVelocity * longitudinalFriction;
+    }
+
+    rigidbody.AddForce(force);
+}
+```
+
+### Lateral Force
+
+The lateral force is calculated similarly to the longitudinal force except without user input, as such oppositional force is constantly applied.
+
+```cs
+private void ApplyLateralForce()
+{
+    float rightVelocity = Vector3.Dot(transform.right, rigidbody.velocity);
+    rigidbody.AddForce(transform.right * -rightVelocity * lateralFriction);
+}
+```
+
 ## Player Abilities
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_2.gif)
