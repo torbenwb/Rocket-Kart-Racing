@@ -158,6 +158,44 @@ private void ApplyAirRotationForce(){
 }
 ```
 
+### Rocket Boost
+
+The boost ability is intended not only to help the player achieve higher speeds but also to control their movement while in the air. As such, the boost should propel the player forward in whatever direction they are currently facing. The rocket boost requires a boost resource which depletes while in use, but can be replenished by pickups on the track.
+
+#### `RocketBoost`
+
+```cs
+private void FixedUpdate()
+{
+    PlayerUI.SetImageFill("Boost Meter Fill", boost / maxBoost);
+    if (!active || boost <= 0f) {
+        particleSystem.Stop();
+        return;
+    }
+
+    float forwardVelocity = Vector3.Dot(transform.forward, rigidbody.velocity);
+    float speedRatio = (1 - (forwardVelocity / forceStrength));
+    rigidbody.AddForce(transform.forward * forceStrength * speedRatio);
+    boost -= Time.fixedDeltaTime;
+}
+```
+
+#### `Pickup`
+
+The boost pickup script is intended to be easily reusable for other pickups so instead of getting a reference to a `RocketBoost` component and calling `MaxBoost()` it sends a message using the `GameObject.SendMessage()` method.
+
+```cs
+private void OnTriggerEnter(Collider other)
+{
+    if (active && other.attachedRigidbody.gameObject.CompareTag(validTag)){
+        other.attachedRigidbody.gameObject.SendMessage(messageName, SendMessageOptions.DontRequireReceiver);
+        ToggleActive(false);
+        StartCoroutine(Respawn());
+        Instantiate(particleSystemPrefab,transform.position, transform.rotation);
+    }
+}
+```
+
 ## Time Trials 
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_3.gif)
