@@ -1,4 +1,4 @@
-# MC_Rocket_Kart_Racing
+# Rocket_Kart_Racing
 
 In this project my goal was to create a racing game using a physics driven car model while incorporating the player abilities from Rocket League specifically the abilities to jump / air jump, control the rotation of the car in the air, and to rocket boost in the car's forward direction. With the car and abilities, I created a simple time trials game mode designed to require the use of these abilities.
 
