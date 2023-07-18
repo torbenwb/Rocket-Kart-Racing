@@ -4,6 +4,10 @@ In this project my goal was to create a racing game using a physics driven car m
 
 You can play the current WebGL build of the game [here](https://torbenwb.github.io/RocketKartRacing_WebGL/)
 
+- Programmed car physics including suspension spring force, longitudinal and lateral friction.
+- Programmed rocket air control gameplay systems using rigidbody physics.
+- Programmed extensible checkpoint and racing system.
+
 ## Physics Driven Car
 
 ![](https://github.com/torbenwb/MC_Rocket_Kart_Racing/blob/main/ReadMe_Images/Chapter_1.gif)
