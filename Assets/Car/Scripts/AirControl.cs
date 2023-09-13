@@ -78,6 +78,9 @@ public class AirControl : MonoBehaviour
             jumpFX.Play();
         }
         else{
+            if (Physics.Raycast(transform.position, transform.up, 2f)){
+                rigidbody.AddForce(-transform.up * jumpStrength, ForceMode.Impulse);
+            }
             if (airJumps > 0){
                 rigidbody.AddForce(transform.up * jumpStrength * airMod, ForceMode.Impulse);
                 jumpFX.Play();

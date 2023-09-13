@@ -107,11 +107,12 @@ public class TimeTrials : MonoBehaviour
         raceActive = false;
         player.SetControlEnabled(false);
         
-        HighScore();
+        //HighScore();
+        Leaderboard();
     }
 
     private void Restart(){
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("TimeTrials");
     }
 
     private void HighScore(){
@@ -141,8 +142,8 @@ public class TimeTrials : MonoBehaviour
         PlayerPrefs.SetInt($"{trackName}_leaderboardCount", leaderboardCount);
 
         string leaderboard = "";
-        for (int i = 0; i < 5; i++){
-            leaderboard += $"{i + 1}: {scores[i].ToString("0.000\n")}";
+        for (int i = 0; i < 5 && i < leaderboardCount; i++){
+            leaderboard += $"{i + 1}.   {scores[i].ToString("0.000\n")}";
         }
         
         PlayerUI.SetText("Leaderboard", leaderboard);

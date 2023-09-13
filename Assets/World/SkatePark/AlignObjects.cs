@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
+/*
 [CustomEditor(typeof(AlignObjects))]
 public class AlignObjectsEditor : Editor{
     public override void OnInspectorGUI()
@@ -36,3 +36,4 @@ public class AlignObjects : MonoBehaviour
         
     }
 }
+*/
