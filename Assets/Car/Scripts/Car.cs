@@ -116,7 +116,7 @@ public class Car : MonoBehaviour
                 float suspensionForce = (springStrength * offset) + (-pointVelocity * springDamping);
                 rigidbody.AddForceAtPosition(wheel.up * suspensionForce, wheel.position);
 
-                // NEW 
+                // Visual component added later - move wheel to ground
                 wheel.GetChild(0).transform.localPosition = Vector3.up * offset;
             }
         }
