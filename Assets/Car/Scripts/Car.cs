@@ -32,6 +32,8 @@ public class Car : MonoBehaviour
         this.turnAxis = Mathf.Clamp(turnAxis, -1f, 1f);
     }
 
+    public bool GetGrounded() => grounded;
+
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
